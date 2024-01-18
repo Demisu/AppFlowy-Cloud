@@ -15,6 +15,7 @@ use actix_web::{dev::Server, web, web::Data, App, HttpServer};
 
 use actix::Actor;
 use anyhow::{Context, Error};
+use database::file::BucketStorage;
 use openssl::ssl::{SslAcceptor, SslAcceptorBuilder, SslFiletype, SslMethod};
 use openssl::x509::X509;
 use secrecy::{ExposeSecret, Secret};
@@ -41,7 +42,7 @@ use crate::middleware::access_control_mw::WorkspaceAccessControl;
 
 use crate::middleware::metrics_mw::MetricsMiddleware;
 use casbin::CoreApi;
-use database::file::bucket_s3_impl::S3BucketStorage;
+use database::file::bucket_s3_impl::{BucketClientS3Impl, S3BucketStorage};
 use realtime::collaborate::CollabServer;
 
 pub struct Application {
@@ -162,9 +163,9 @@ pub async fn init_state(config: &Config) -> Result<AppState, Error> {
   migrate(&pg_pool).await?;
 
   // Bucket storage
-  info!("Setting up S3 bucket...");
-  let s3_bucket = get_aws_s3_bucket(&config.s3).await?;
-  let bucket_storage = Arc::new(S3BucketStorage::from_s3_bucket(s3_bucket, pg_pool.clone()));
+  // info!("Setting up S3 bucket...");
+  // let s3_bucket = get_aws_s3_bucket(&config.s3).await?;
+  // let bucket_storage = Arc::new(S3BucketStorage::from_s3_bucket(s3_bucket, pg_pool.clone()));
 
   // Gotrue
   info!("Connecting to GoTrue...");
@@ -215,7 +216,7 @@ pub async fn init_state(config: &Config) -> Result<AppState, Error> {
     collab_storage,
     collab_access_control,
     workspace_access_control,
-    bucket_storage,
+    // bucket_storage,
     pg_listeners,
     casbin_access_control,
   })

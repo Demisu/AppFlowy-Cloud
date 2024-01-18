@@ -96,11 +96,11 @@ async fn put_blob_handler(
     content_length
   );
 
-  state
-    .bucket_storage
-    .put_blob(workspace_id, file_id.to_string(), content, content_type)
-    .await
-    .map_err(AppResponseError::from)?;
+  // state
+  //   .bucket_storage
+  //   .put_blob(workspace_id, file_id.to_string(), content, content_type)
+  //   .await
+  //   .map_err(AppResponseError::from)?;
 
   Ok(AppResponse::Ok().into())
 }
@@ -111,11 +111,11 @@ async fn delete_blob_handler(
   path: web::Path<(Uuid, String)>,
 ) -> Result<JsonAppResponse<()>> {
   let (workspace_id, file_id) = path.into_inner();
-  state
-    .bucket_storage
-    .delete_blob(&workspace_id, &file_id)
-    .await
-    .map_err(AppResponseError::from)?;
+  // state
+  //   .bucket_storage
+  //   .delete_blob(&workspace_id, &file_id)
+  //   .await
+  //   .map_err(AppResponseError::from)?;
   Ok(AppResponse::Ok().into())
 }
 
@@ -128,46 +128,47 @@ async fn get_blob_handler(
   let (workspace_id, file_id) = path.into_inner();
 
   // Get the metadata
-  let result = state
-    .bucket_storage
-    .get_blob_metadata(&workspace_id, &file_id)
-    .await;
+  // let result = state
+  //   .bucket_storage
+  //   .get_blob_metadata(&workspace_id, &file_id)
+  //   .await;
 
-  if let Err(err) = result.as_ref() {
-    return if err.is_record_not_found() {
-      Ok(HttpResponse::NotFound().finish())
-    } else {
-      Ok(HttpResponse::InternalServerError().finish())
-    };
-  }
+  // if let Err(err) = result.as_ref() {
+  //   return if err.is_record_not_found() {
+  //     Ok(HttpResponse::NotFound().finish())
+  //   } else {
+  //     Ok(HttpResponse::InternalServerError().finish())
+  //   };
+  // }
 
-  let metadata = result.unwrap();
-  // Check if the file is modified since the last time
-  if let Some(modified_since) = req
-    .headers()
-    .get(IF_MODIFIED_SINCE)
-    .and_then(|h| h.to_str().ok())
-    .and_then(|s| DateTime::parse_from_rfc2822(s).ok())
-  {
-    if metadata.modified_at.naive_utc() <= modified_since.naive_utc() {
-      return Ok(HttpResponse::NotModified().finish());
-    }
-  }
-  let blob = state
-    .bucket_storage
-    .get_blob(&workspace_id, &file_id)
-    .await
-    .map_err(AppResponseError::from)?;
+  // let metadata = result.unwrap();
+  // // Check if the file is modified since the last time
+  // if let Some(modified_since) = req
+  //   .headers()
+  //   .get(IF_MODIFIED_SINCE)
+  //   .and_then(|h| h.to_str().ok())
+  //   .and_then(|s| DateTime::parse_from_rfc2822(s).ok())
+  // {
+  //   if metadata.modified_at.naive_utc() <= modified_since.naive_utc() {
+  //     return Ok(HttpResponse::NotModified().finish());
+  //   }
+  // }
+  // let blob = state
+  //   .bucket_storage
+  //   .get_blob(&workspace_id, &file_id)
+  //   .await
+  //   .map_err(AppResponseError::from)?;
 
-  let response = HttpResponse::Ok()
-    .append_header((ETAG, file_id))
-    .append_header((CONTENT_TYPE, metadata.file_type))
-    .append_header((LAST_MODIFIED, metadata.modified_at.to_rfc2822()))
-    .append_header((CONTENT_LENGTH, blob.len()))
-    .append_header((CACHE_CONTROL, "public, immutable, max-age=31536000"))// 31536000 seconds = 1 year
-    .body(blob);
+  // let response = HttpResponse::Ok()
+  //   .append_header((ETAG, file_id))
+  //   .append_header((CONTENT_TYPE, metadata.file_type))
+  //   .append_header((LAST_MODIFIED, metadata.modified_at.to_rfc2822()))
+  //   .append_header((CONTENT_LENGTH, blob.len()))
+  //   .append_header((CACHE_CONTROL, "public, immutable, max-age=31536000"))// 31536000 seconds = 1 year
+  //   .body(blob);
 
-  Ok(response)
+  // Ok(response)
+  todo!()
 }
 
 #[instrument(level = "debug", skip(state), err)]
@@ -175,23 +176,24 @@ async fn get_blob_metadata_handler(
   state: Data<AppState>,
   path: web::Path<(Uuid, String)>,
 ) -> Result<JsonAppResponse<BlobMetadata>> {
-  let (workspace_id, file_id) = path.into_inner();
+  // let (workspace_id, file_id) = path.into_inner();
 
-  // Get the metadata
-  let metadata = state
-    .bucket_storage
-    .get_blob_metadata(&workspace_id, &file_id)
-    .await
-    .map(|meta| BlobMetadata {
-      workspace_id: meta.workspace_id,
-      file_id: meta.file_id,
-      file_type: meta.file_type,
-      file_size: meta.file_size,
-      modified_at: meta.modified_at,
-    })
-    .map_err(AppResponseError::from)?;
+  // // Get the metadata
+  // let metadata = state
+  //   .bucket_storage
+  //   .get_blob_metadata(&workspace_id, &file_id)
+  //   .await
+  //   .map(|meta| BlobMetadata {
+  //     workspace_id: meta.workspace_id,
+  //     file_id: meta.file_id,
+  //     file_type: meta.file_type,
+  //     file_size: meta.file_size,
+  //     modified_at: meta.modified_at,
+  //   })
+  //   .map_err(AppResponseError::from)?;
 
-  Ok(Json(AppResponse::Ok().with_data(metadata)))
+  // Ok(Json(AppResponse::Ok().with_data(metadata)))
+  todo!()
 }
 
 #[instrument(level = "debug", skip(state), err)]

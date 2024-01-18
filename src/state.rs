@@ -24,7 +24,7 @@ pub struct AppState {
   pub collab_storage: Arc<CollabPostgresDBStorage>,
   pub collab_access_control: CasbinCollabAccessControl,
   pub workspace_access_control: CasbinWorkspaceAccessControl,
-  pub bucket_storage: Arc<S3BucketStorage>,
+  // pub bucket_storage: Arc<S3BucketStorage>,
   pub pg_listeners: Arc<PgListeners>,
   pub casbin_access_control: CasbinAccessControl,
 }
